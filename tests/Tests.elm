@@ -24,4 +24,12 @@ all =
               \() ->
                 Expect.equal 0 (reduce (\s x -> s + x) 0 [])
           ]
+        , describe "reduceRight"
+          [ test "non-empty list" <|
+            \() ->
+              Expect.equal "321" (reduce (\s x -> s ++ x) "" ["1", "2", "3"])
+            , test "empty list" <|
+              \() ->
+                Expect.equal "" (reduce (\s x -> s ++ x) "" [])
+          ]
         ]
