@@ -1,6 +1,6 @@
 module Tests exposing (..)
 
-import Underscore exposing (map, reduce)
+import Underscore exposing (map, reduce, reduceRight, find)
 
 import Test exposing (..)
 import Expect
@@ -27,9 +27,20 @@ all =
         , describe "reduceRight"
           [ test "non-empty list" <|
             \() ->
-              Expect.equal "321" (reduce (\s x -> s ++ x) "" ["1", "2", "3"])
+              Expect.equal "123" (reduceRight (\s x -> s ++ x) "" ["1", "2", "3"])
             , test "empty list" <|
               \() ->
-                Expect.equal "" (reduce (\s x -> s ++ x) "" [])
+                Expect.equal "" (reduceRight (\s x -> s ++ x) "" [])
+          ]
+        , describe "find"
+          [ test "finds first element satisfying the predicate" <|
+            \() ->
+              Expect.equal (Just 2) (find (\x -> x % 2 == 0) [1, 2, 3, 4])
+            , test "returns Nothing if no element is found" <|
+              \() ->
+                Expect.equal Nothing (find (\x -> x % 2 == 0) [1, 3, 5])
+            , test "returns Nothing if list is empty" <|
+              \() ->
+                Expect.equal Nothing (find (\x -> x % 2 == 0) [])
           ]
         ]
