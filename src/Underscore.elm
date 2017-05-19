@@ -5,7 +5,9 @@ module Underscore exposing (
   find,
   filter,
   whereDict,
-  reject)
+  reject,
+  every,
+  some)
 
 {-| Port to Elm of Underscore 1.8.3 functions.
 
@@ -16,6 +18,8 @@ module Underscore exposing (
 @docs filter
 @docs whereDict
 @docs reject
+@docs every
+@docs some
 -}
 
 import List exposing (map, foldl, filter, all)
@@ -85,3 +89,17 @@ whereDict pairs list =
 -}
 reject : (a -> Bool) -> List a -> List a
 reject predicate list = filter (\item -> not (predicate(item))) list
+
+{-| Determine if all the elements in the list satisfy the predicate.
+
+....every (\x -> x > 1) [1, 2, 3] == False
+-}
+every : (a -> Bool) -> List a -> Bool
+every = List.all
+
+{-| Determine if some of the elements in the list satisfy the predicate.
+
+....every (\x -> x > 1) [1, 2, 3] == True
+-}
+some : (a -> Bool) -> List a -> Bool
+some = List.any
