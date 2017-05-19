@@ -1,6 +1,6 @@
 module Tests exposing (..)
 
-import Underscore exposing (map, reduce, reduceRight, find, filter, whereDict)
+import Underscore exposing (map, reduce, reduceRight, find, filter, whereDict, reject)
 
 import Dict exposing (fromList)
 import Test exposing (..)
@@ -62,5 +62,13 @@ all =
             , test "returns empty list if list is empty" <|
               \() ->
                 Expect.equal [] (whereDict (Dict.fromList [(2, '2')]) [])
+          ]
+        , describe "reject"
+          [ test "rejects the elements matching the provided dictionary" <|
+            \() ->
+              Expect.equal [1, 3] (Underscore.reject (\x -> x % 2 == 0) [1, 2, 3, 4])
+            , test "returns empty list if list is empty" <|
+              \() ->
+                Expect.equal [] (Underscore.reject (\x -> x % 2 == 0) [])
           ]
         ]

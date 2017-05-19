@@ -1,4 +1,11 @@
-module Underscore exposing (map, reduce, reduceRight, find, filter, whereDict)
+module Underscore exposing (
+  map,
+  reduce,
+  reduceRight,
+  find,
+  filter,
+  whereDict,
+  reject)
 
 {-| Port to Elm of Underscore 1.8.3 functions.
 
@@ -8,6 +15,7 @@ module Underscore exposing (map, reduce, reduceRight, find, filter, whereDict)
 @docs find
 @docs filter
 @docs whereDict
+@docs reject
 -}
 
 import List exposing (map, foldl, filter, all)
@@ -70,3 +78,10 @@ whereDict pairs list =
       in
         List.all keyValueMatchesCheck pairKeys
     ) list
+
+{-| Returns the list of the elements of the list that do not satisfy the given predicate.
+
+....reject (\x -> x > 1) [1, 2, 3] == [1]
+-}
+reject : (a -> Bool) -> List a -> List a
+reject predicate list = filter (\item -> not (predicate(item))) list
