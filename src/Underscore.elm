@@ -7,7 +7,8 @@ module Underscore exposing (
   whereDict,
   reject,
   every,
-  some)
+  some,
+  contains)
 
 {-| Port to Elm of Underscore 1.8.3 functions.
 
@@ -20,6 +21,7 @@ module Underscore exposing (
 @docs reject
 @docs every
 @docs some
+@docs contains
 -}
 
 import List exposing (map, foldl, filter, all)
@@ -103,3 +105,10 @@ every = List.all
 -}
 some : (a -> Bool) -> List a -> Bool
 some = List.any
+
+{-| Determine if the list contains the element.
+
+    contains 2 [1 2 3] == True
+-}
+contains : a -> List a -> Bool
+contains = List.member

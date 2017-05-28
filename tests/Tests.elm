@@ -9,7 +9,8 @@ import Underscore exposing (
   whereDict,
   reject,
   every,
-  some)
+  some,
+  contains)
 
 import Dict exposing (fromList)
 import Test exposing (..)
@@ -95,5 +96,13 @@ all =
             , test "at least one element satisfies the predicate" <|
             \() ->
               Expect.equal True (Underscore.some (\x -> x % 2 == 0) [2, 3, 6])
+          ]
+        , describe "contains"
+          [ test "list contains element" <|
+            \() ->
+              Expect.equal True (Underscore.contains 2 [1, 2, 3])
+            , test "list does not contain element" <|
+            \() ->
+              Expect.equal False (Underscore.contains 4 [1, 2, 3])
           ]
         ]
