@@ -8,7 +8,8 @@ module Underscore exposing (
   reject,
   every,
   some,
-  contains)
+  contains,
+  pluck)
 
 {-| Port to Elm of Underscore 1.8.3 functions.
 
@@ -22,6 +23,7 @@ module Underscore exposing (
 @docs every
 @docs some
 @docs contains
+@docs pluck
 -}
 
 import List exposing (map, foldl, filter, all)
@@ -71,7 +73,10 @@ filter = List.filter
 
 {-| Returns the list of the dictionaries contained in the list that contain the given dictionary as a subdictionary.
 
-    whereDict (\x -> x > 1) [1, 2, 3] == [2, 3]
+    (whereDict
+      (Dict.fromList [(2, "2")])
+      [Dict.fromList [(1, "1"), (2, "2")], Dict.fromList [(2, "2"), (3, "3")], Dict.fromList [(3, "3"), (4, "4")]]) ==
+    [Dict.fromList [(1, "1"), (2, "2")], Dict.fromList [(2, "2"), (3, "3")]]
 -}
 whereDict : Dict comparable v -> List (Dict comparable v) -> List (Dict comparable v)
 whereDict pairs list =
@@ -112,3 +117,16 @@ some = List.any
 -}
 contains : a -> List a -> Bool
 contains = List.member
+
+-- Skipping "invoke", no object methods in Elm
+
+{-| Extract a list of dictionary values with a specific key.
+
+....pluck "name" [
+      Dict.fromList [("name", "name1"), ("email", "email1")],
+      Dict.fromList [("email", "email2")],
+      Dict.fromList [("name", "name3"), ("email", "email3")]
+    ] == [Just "name1", Nothing, Just "name3"]
+-}
+pluck : comparable -> List (Dict comparable v) -> List (Maybe v)
+pluck keyName list = List.map (\d -> (Dict.get keyName d)) list

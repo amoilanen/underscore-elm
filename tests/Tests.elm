@@ -10,7 +10,8 @@ import Underscore exposing (
   reject,
   every,
   some,
-  contains)
+  contains,
+  pluck)
 
 import Dict exposing (fromList)
 import Test exposing (..)
@@ -65,13 +66,13 @@ all =
         , describe "whereDict"
           [ test "leaves only the elements matching the provided dictionary" <|
             \() ->
-              Expect.equal [Dict.fromList [(1, '1'), (2, '2')], Dict.fromList [(2, '2'), (3, '3')]] (whereDict
-                (Dict.fromList [(2, '2')])
-                [Dict.fromList [(1, '1'), (2, '2')], Dict.fromList [(2, '2'), (3, '3')], Dict.fromList [(3, '3'), (4, '4')]]
+              Expect.equal [Dict.fromList [(1, "1"), (2, "2")], Dict.fromList [(2, "2"), (3, "3")]] (whereDict
+                (Dict.fromList [(2, "2")])
+                [Dict.fromList [(1, "1"), (2, "2")], Dict.fromList [(2, "2"), (3, "3")], Dict.fromList [(3, "3"), (4, "4")]]
               )
             , test "returns empty list if list is empty" <|
             \() ->
-              Expect.equal [] (whereDict (Dict.fromList [(2, '2')]) [])
+              Expect.equal [] (whereDict (Dict.fromList [(2, "2")]) [])
           ]
         , describe "reject"
           [ test "rejects the elements matching the provided dictionary" <|
@@ -104,5 +105,16 @@ all =
             , test "list does not contain element" <|
             \() ->
               Expect.equal False (Underscore.contains 4 [1, 2, 3])
+          ]
+        , describe "pluck"
+          [ test "list of dictionaries some of which contain key" <|
+            \() ->
+              Expect.equal
+                [Just "name1", Nothing, Just "name3"]
+                (pluck "name" [
+                  Dict.fromList [("name", "name1"), ("email", "email1")],
+                  Dict.fromList [("email", "email2")],
+                  Dict.fromList [("name", "name3"), ("email", "email3")]
+                ])
           ]
         ]
