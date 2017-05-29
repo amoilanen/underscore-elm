@@ -5,10 +5,14 @@ module Underscore exposing (
   find,
   filter,
   whereDict,
+  whereProperty,
+  findWhereDict,
+  findWhereProperty,
   reject,
   every,
   some,
   contains,
+  pluckDict,
   pluck)
 
 {-| Port to Elm of Underscore 1.8.3 functions.
@@ -19,11 +23,15 @@ module Underscore exposing (
 @docs find
 @docs filter
 @docs whereDict
+@docs whereProperty
+@docs findWhereDict
+@docs findWhereProperty
 @docs reject
 @docs every
 @docs some
 @docs contains
 @docs pluck
+@docs pluckDict
 -}
 
 import List exposing (map, foldl, filter, all)
@@ -90,6 +98,55 @@ whereDict pairs list =
         List.all keyValueMatchesCheck pairKeys
     ) list
 
+{-| Returns the list containing the records where the property has the given value.
+This function should have been called "where", but it is a reserved keyword in Elm,
+then it is "whereProperty".
+
+....(whereProperty .country "Finland" [
+      { city = "Helsinki", country = "Finland" }
+      , { city = "Turku", country = "Finland" }
+      , { city = "Tallinn", country = "Estonia" }
+    ]) == [
+      { city = "Helsinki", country = "Finland" }
+      , { city = "Turku", country = "Finland" }
+    ]
+-}
+whereProperty : (a -> comparable) -> comparable -> List a -> List a
+whereProperty property propertyValue list = filter (\item -> (property item) == propertyValue ) list
+
+{-| Returns the first matching value in the list that contain the given dictionary as a subdictionary.
+
+    (findWhereDict
+      (Dict.fromList [(2, "2")])
+      [Dict.fromList [(1, "1"), (2, "2")], Dict.fromList [(2, "2"), (3, "3")], Dict.fromList [(3, "3"), (4, "4")]]) ==
+    Just (Dict.fromList [(1, "1"), (2, "2")])
+-}
+findWhereDict : Dict comparable v -> List (Dict comparable v) -> Maybe (Dict comparable v)
+findWhereDict pairs list =
+  let
+    matchingDictionaries = (whereDict pairs list)
+  in
+    case matchingDictionaries of
+      head::tail -> Just head
+      _ -> Nothing
+
+{-| Returns the first matching value in the list where the property has the given value.
+
+....(findWhereProperty .country "Finland" [
+      { city = "Helsinki", country = "Finland" }
+      , { city = "Turku", country = "Finland" }
+      , { city = "Tallinn", country = "Estonia" }
+    ]) == Just ({ city = "Helsinki", country = "Finland" })
+-}
+findWhereProperty : (a -> comparable) -> comparable -> List a -> Maybe a
+findWhereProperty property propertyValue list =
+  let
+    matchingValues = (whereProperty property propertyValue list)
+  in
+    case matchingValues of
+      head::tail -> Just head
+      _ -> Nothing
+
 {-| Returns the list of the elements of the list that do not satisfy the given predicate.
 
 ....reject (\x -> x > 1) [1, 2, 3] == [1]
@@ -122,11 +179,22 @@ contains = List.member
 
 {-| Extract a list of dictionary values with a specific key.
 
-....pluck "name" [
+....pluckDict "name" [
       Dict.fromList [("name", "name1"), ("email", "email1")],
       Dict.fromList [("email", "email2")],
       Dict.fromList [("name", "name3"), ("email", "email3")]
     ] == [Just "name1", Nothing, Just "name3"]
 -}
-pluck : comparable -> List (Dict comparable v) -> List (Maybe v)
-pluck keyName list = List.map (\d -> (Dict.get keyName d)) list
+pluckDict : comparable -> List (Dict comparable v) -> List (Maybe v)
+pluckDict keyName list = List.map (\d -> (Dict.get keyName d)) list
+
+{-| Extract a list of values from a list of records by a derived property.
+
+....pluck .name [
+      { name="Alice", height=1.62 }
+      , { name="Bob", height=1.85 }
+      , { name="Chuck", height=1.76 }
+    ] == ["Alice", "Bob", "Chuck"]
+-}
+pluck : (a -> comparable) -> List a -> List comparable
+pluck property list = List.map property list

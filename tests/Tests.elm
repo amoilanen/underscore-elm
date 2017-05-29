@@ -7,10 +7,14 @@ import Underscore exposing (
   find,
   filter,
   whereDict,
+  whereProperty,
+  findWhereDict,
+  findWhereProperty,
   reject,
   every,
   some,
   contains,
+  pluckDict,
   pluck)
 
 import Dict exposing (fromList)
@@ -74,6 +78,57 @@ all =
             \() ->
               Expect.equal [] (whereDict (Dict.fromList [(2, "2")]) [])
           ]
+        , describe "whereProperty"
+          [ test "leaves only the elements matching the provided property value" <|
+            \() ->
+              let
+                expectedValue = [
+                  { city = "Helsinki", country = "Finland" }
+                  , { city = "Turku", country = "Finland" }
+                ]
+                actualValue = (whereProperty .country "Finland" [
+                  { city = "Helsinki", country = "Finland" }
+                  , { city = "Turku", country = "Finland" }
+                  , { city = "Tallinn", country = "Estonia" }
+                ])
+              in
+                Expect.equal expectedValue actualValue
+          ]
+        , describe "findWhereDict"
+          [ test "return first element if there are multiple matching elements" <|
+            \() ->
+              Expect.equal (Just (Dict.fromList [(1, "1"), (2, "2")])) (findWhereDict
+                (Dict.fromList [(2, "2")])
+                [Dict.fromList [(1, "1"), (2, "2")], Dict.fromList [(2, "2"), (3, "3")], Dict.fromList [(3, "3"), (4, "4")]]
+              )
+            , test "returns Nothing if there are no matching elements" <|
+            \() ->
+              Expect.equal Nothing (findWhereDict (Dict.fromList [(2, "2")]) [])
+          ]
+        , describe "findWhereProperty"
+          [ test "returns first element if there are multiple matching elements" <|
+            \() ->
+              let
+                expectedValue = Just ({ city = "Helsinki", country = "Finland" })
+                actualValue = (findWhereProperty .country "Finland" [
+                  { city = "Helsinki", country = "Finland" }
+                  , { city = "Turku", country = "Finland" }
+                  , { city = "Tallinn", country = "Estonia" }
+                ])
+              in
+                Expect.equal expectedValue actualValue
+            , test "returns Nothing if there are no matching elements" <|
+            \() ->
+              let
+                expectedValue = Nothing
+                actualValue = (findWhereProperty .country "Latvia" [
+                  { city = "Helsinki", country = "Finland" }
+                  , { city = "Turku", country = "Finland" }
+                  , { city = "Tallinn", country = "Estonia" }
+                ])
+              in
+                Expect.equal expectedValue actualValue
+          ]
         , describe "reject"
           [ test "rejects the elements matching the provided dictionary" <|
             \() ->
@@ -106,15 +161,26 @@ all =
             \() ->
               Expect.equal False (Underscore.contains 4 [1, 2, 3])
           ]
-        , describe "pluck"
+        , describe "pluckDict"
           [ test "list of dictionaries some of which contain key" <|
             \() ->
               Expect.equal
                 [Just "name1", Nothing, Just "name3"]
-                (pluck "name" [
+                (pluckDict "name" [
                   Dict.fromList [("name", "name1"), ("email", "email1")],
                   Dict.fromList [("email", "email2")],
                   Dict.fromList [("name", "name3"), ("email", "email3")]
+                ])
+          ]
+        , describe "pluck"
+          [ test "list some of which contain property" <|
+            \() ->
+              Expect.equal
+                ["Alice", "Bob", "Chuck"]
+                (pluck .name [
+                  { name="Alice", height=1.62 }
+                  , { name="Bob", height=1.85 }
+                  , { name="Chuck", height=1.76 }
                 ])
           ]
         ]
