@@ -123,12 +123,7 @@ whereProperty property propertyValue list = filter (\item -> (property item) == 
 -}
 findWhereDict : Dict comparable v -> List (Dict comparable v) -> Maybe (Dict comparable v)
 findWhereDict pairs list =
-  let
-    matchingDictionaries = (whereDict pairs list)
-  in
-    case matchingDictionaries of
-      head::tail -> Just head
-      _ -> Nothing
+  List.head (whereDict pairs list)
 
 {-| Returns the first matching value in the list where the property has the given value.
 
@@ -140,12 +135,7 @@ findWhereDict pairs list =
 -}
 findWhereProperty : (a -> comparable) -> comparable -> List a -> Maybe a
 findWhereProperty property propertyValue list =
-  let
-    matchingValues = (whereProperty property propertyValue list)
-  in
-    case matchingValues of
-      head::tail -> Just head
-      _ -> Nothing
+  List.head (whereProperty property propertyValue list)
 
 {-| Returns the list of the elements of the list that do not satisfy the given predicate.
 
