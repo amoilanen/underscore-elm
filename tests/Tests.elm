@@ -17,7 +17,8 @@ import Underscore exposing (
   pluckDict,
   pluck,
   min,
-  max)
+  max,
+  sortBy)
 
 import Dict exposing (fromList)
 import Test exposing (..)
@@ -200,5 +201,23 @@ all =
             , test "empty list" <|
             \() ->
               Expect.equal Nothing (Underscore.max [])
+          ]
+        , describe "sortBy"
+          [ test "sorts list by given property" <|
+            \() ->
+              let
+                expectedValue = sortBy .name
+                  [
+                    {name = "Bob"},
+                    {name = "Steve"},
+                    {name = "Alice"}
+                  ]
+                actualValue = [
+                  {name = "Alice"},
+                  {name = "Bob"},
+                  {name = "Steve"}
+                ]
+              in
+                Expect.equal expectedValue actualValue
           ]
         ]

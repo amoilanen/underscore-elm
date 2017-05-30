@@ -15,7 +15,8 @@ module Underscore exposing (
   pluckDict,
   pluck,
   min,
-  max)
+  max,
+  sortBy)
 
 {-| Port to Elm of Underscore 1.8.3 functions.
 
@@ -36,6 +37,7 @@ module Underscore exposing (
 @docs pluckDict
 @docs min
 @docs max
+@docs sortBy
 -}
 
 import List exposing (map, foldl, filter, all)
@@ -206,3 +208,19 @@ min list = List.minimum list
 -}
 max : List comparable -> Maybe comparable
 max list = List.maximum list
+
+{-| Sort list by a given property
+
+....sortBy .name
+      [
+        {name = "Bob"},
+        {name = "Steve"},
+        {name = "Alice"}
+      ] == [
+             {name = "Alice"},
+             {name = "Bob"},
+             {name = "Steve"}
+          ]
+-}
+sortBy : (a -> comparable) -> List a -> List a
+sortBy property list = List.sortBy property list
