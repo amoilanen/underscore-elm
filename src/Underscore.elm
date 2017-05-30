@@ -13,7 +13,9 @@ module Underscore exposing (
   some,
   contains,
   pluckDict,
-  pluck)
+  pluck,
+  min,
+  max)
 
 {-| Port to Elm of Underscore 1.8.3 functions.
 
@@ -32,6 +34,8 @@ module Underscore exposing (
 @docs contains
 @docs pluck
 @docs pluckDict
+@docs min
+@docs max
 -}
 
 import List exposing (map, foldl, filter, all)
@@ -188,3 +192,17 @@ pluckDict keyName list = List.map (\d -> (Dict.get keyName d)) list
 -}
 pluck : (a -> comparable) -> List a -> List comparable
 pluck property list = List.map property list
+
+{-| Return minimum element in the list.
+
+....min [2, 1, 3] == 1
+-}
+min : List comparable -> Maybe comparable
+min list = List.minimum list
+
+{-| Return maximum element in the list.
+
+....min [2, 1, 3] == 3
+-}
+max : List comparable -> Maybe comparable
+max list = List.maximum list

@@ -15,7 +15,9 @@ import Underscore exposing (
   some,
   contains,
   pluckDict,
-  pluck)
+  pluck,
+  min,
+  max)
 
 import Dict exposing (fromList)
 import Test exposing (..)
@@ -182,5 +184,21 @@ all =
                   , { name="Bob", height=1.85 }
                   , { name="Chuck", height=1.76 }
                 ])
+          ]
+        , describe "min"
+          [ test "list with a minimum element" <|
+            \() ->
+              Expect.equal (Just 1) (Underscore.min [2, 1, 3])
+            , test "empty list" <|
+            \() ->
+              Expect.equal Nothing (Underscore.min [])
+          ]
+        , describe "max"
+          [ test "list with a maximum element" <|
+            \() ->
+              Expect.equal (Just 3) (Underscore.max [2, 1, 3])
+            , test "empty list" <|
+            \() ->
+              Expect.equal Nothing (Underscore.max [])
           ]
         ]
