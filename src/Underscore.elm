@@ -227,31 +227,6 @@ max list = List.maximum list
 sortBy : (a -> comparable) -> List a -> List a
 sortBy property list = List.sortBy property list
 
-appendToDictValue_ : Maybe (List a) -> a -> Maybe (List a)
-appendToDictValue_ list value =
-  case list of
-    Just list -> Just (list ++ [value])
-    Nothing -> Just [value]
-
---Replace with foldr?
-groupByAcc_ : (a -> comparable) -> List a -> Dict comparable (List a) -> Dict comparable (List a)
-groupByAcc_ property list dict =
-  case list of
-    head::tail ->
-      let
-        updatedDict = let
-          itemProperty = property head
-        in
-          (
-            Dict.update
-              itemProperty
-              (\maybeValue -> (appendToDictValue_ maybeValue head))
-              dict
-          )
-      in
-        (groupByAcc_ property tail updatedDict)
-    _ -> dict
-
 {-| Groups elements of the list by a given property into a dictionary.
 
     groupBy
@@ -262,4 +237,22 @@ groupByAcc_ property list dict =
                       ]
 -}
 groupBy : (a -> comparable) -> List a -> Dict comparable (List a)
-groupBy property list = (groupByAcc_ property list Dict.empty)
+groupBy property list =
+  let
+    appendToDictValue = (\list value ->
+      case list of
+        Just list -> Just (value :: list)
+        Nothing -> Just [value])
+    reductionStep = (\item dict ->
+      let
+        itemProperty = property item
+      in
+        (
+          Dict.update
+            itemProperty
+            (\maybeValue -> (appendToDictValue maybeValue item))
+            dict
+        )
+    )
+  in 
+    List.foldr reductionStep Dict.empty list
