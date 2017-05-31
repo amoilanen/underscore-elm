@@ -72,13 +72,7 @@ reduceRight = List.foldr
 -}
 find : (a -> Bool) -> List a -> Maybe a
 find predicate list =
-  case list of
-    head::rest ->
-      if predicate head then
-        Just head
-      else
-        find predicate rest
-    [] -> Nothing
+  List.head (List.filter predicate list)
 
 {-| Returns the list of the elements of the list that satisfy the given predicate.
 
