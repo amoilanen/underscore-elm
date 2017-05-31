@@ -16,7 +16,8 @@ module Underscore exposing (
   pluck,
   min,
   max,
-  sortBy)
+  sortBy,
+  groupBy)
 
 {-| Port to Elm of Underscore 1.8.3 functions.
 
@@ -38,10 +39,11 @@ module Underscore exposing (
 @docs min
 @docs max
 @docs sortBy
+@docs groupBy
 -}
 
 import List exposing (map, foldl, filter, all)
-import Dict exposing (Dict, keys, get)
+import Dict exposing (Dict, keys, get, update)
 
 {-| Transforms a given list by applying the provided element transformation function to every element.
 
@@ -224,3 +226,40 @@ max list = List.maximum list
 -}
 sortBy : (a -> comparable) -> List a -> List a
 sortBy property list = List.sortBy property list
+
+appendToDictValue_ : Maybe (List a) -> a -> Maybe (List a)
+appendToDictValue_ list value =
+  case list of
+    Just list -> Just (list ++ [value])
+    Nothing -> Just [value]
+
+--Replace with foldr?
+groupByAcc_ : (a -> comparable) -> List a -> Dict comparable (List a) -> Dict comparable (List a)
+groupByAcc_ property list dict =
+  case list of
+    head::tail ->
+      let
+        updatedDict = let
+          itemProperty = property head
+        in
+          (
+            Dict.update
+              itemProperty
+              (\maybeValue -> (appendToDictValue_ maybeValue head))
+              dict
+          )
+      in
+        (groupByAcc_ property tail updatedDict)
+    _ -> dict
+
+{-| Groups elements of the list by a given property into a dictionary.
+
+    groupBy
+      (\x -> if x % 2 == 0 then "odd" else "even")
+      [0, 1, 2, 3] == Dict.fromList [
+                        ("even", [0, 2]),
+                        ("odd", [1, 3])
+                      ]
+-}
+groupBy : (a -> comparable) -> List a -> Dict comparable (List a)
+groupBy property list = (groupByAcc_ property list Dict.empty)

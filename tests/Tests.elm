@@ -18,7 +18,8 @@ import Underscore exposing (
   pluck,
   min,
   max,
-  sortBy)
+  sortBy,
+  groupBy)
 
 import Dict exposing (fromList)
 import Test exposing (..)
@@ -206,17 +207,30 @@ all =
           [ test "sorts list by given property" <|
             \() ->
               let
-                expectedValue = sortBy .name
+                expectedValue = [
+                  {name = "Alice"},
+                  {name = "Bob"},
+                  {name = "Steve"}
+                ]
+                actualValue = sortBy .name
                   [
                     {name = "Bob"},
                     {name = "Steve"},
                     {name = "Alice"}
                   ]
-                actualValue = [
-                  {name = "Alice"},
-                  {name = "Bob"},
-                  {name = "Steve"}
-                ]
+              in
+                Expect.equal expectedValue actualValue
+          ]
+        , describe "groupBy"
+          [ test "groups list by given property" <|
+            \() ->
+              let
+                expectedValue = Dict.fromList
+                  [
+                    ("even", [0, 2]),
+                    ("odd", [1, 3])
+                  ]
+                actualValue = groupBy (\x -> if x % 2 == 0 then "even" else "odd") [0, 1, 2, 3]
               in
                 Expect.equal expectedValue actualValue
           ]
