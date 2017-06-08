@@ -17,7 +17,8 @@ module Underscore exposing (
   min,
   max,
   sortBy,
-  groupBy)
+  groupBy,
+  indexBy)
 
 {-| Port to Elm of Underscore 1.8.3 functions.
 
@@ -40,6 +41,7 @@ module Underscore exposing (
 @docs max
 @docs sortBy
 @docs groupBy
+@docs indexBy
 -}
 
 import List exposing (map, foldl, filter, all)
@@ -245,6 +247,39 @@ groupBy property list =
           Dict.update
             itemProperty
             (\maybeValue -> (appendToDictValue maybeValue item))
+            dict
+        )
+    )
+  in 
+    List.foldr reductionStep Dict.empty list
+
+{-| Same as groupBy, but can be used for the case when we know that the given property is unique.
+
+....indexBy
+      (\x ->
+        let
+          maybeFirstSymbol = List.head <| String.toList x
+        in case maybeFirstSymbol of
+          Just firstSymbol -> (String.fromChar firstSymbol)
+          Nothing -> "?")
+      ["abc", "bca", "cab"]
+      ==  Dict.fromList [
+        ("a", "abc"),
+        ("b", "bca"),
+        ("c", "cab")
+      ]
+-}
+indexBy : (a -> comparable) -> List a -> Dict comparable a
+indexBy property list =
+  let
+    reductionStep = (\item dict ->
+      let
+        itemProperty = property item
+      in
+        (
+          Dict.update
+            itemProperty
+            (\maybeValue -> (Just item))
             dict
         )
     )

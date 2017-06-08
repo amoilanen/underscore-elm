@@ -19,7 +19,8 @@ import Underscore exposing (
   min,
   max,
   sortBy,
-  groupBy)
+  groupBy,
+  indexBy)
 
 import Dict exposing (fromList)
 import Test exposing (..)
@@ -231,6 +232,26 @@ all =
                     ("odd", [1, 3])
                   ]
                 actualValue = groupBy (\x -> if x % 2 == 0 then "even" else "odd") [0, 1, 2, 3]
+              in
+                Expect.equal expectedValue actualValue
+          ]
+        , describe "indexBy"
+          [ test "indexes list by given property" <|
+            \() ->
+              let
+                expectedValue =  Dict.fromList [
+                    ("a", "abc"),
+                    ("b", "bca"),
+                    ("c", "cab")
+                  ]
+                actualValue = indexBy
+                  (\x ->
+                    let
+                      maybeFirstSymbol = List.head <| String.toList x
+                    in case maybeFirstSymbol of
+                      Just firstSymbol -> (String.fromChar firstSymbol)
+                      Nothing -> "?")
+                  ["abc", "bca", "cab"]
               in
                 Expect.equal expectedValue actualValue
           ]
