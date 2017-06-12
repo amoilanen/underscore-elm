@@ -20,9 +20,12 @@ import Underscore exposing (
   max,
   sortBy,
   groupBy,
-  indexBy)
+  indexBy,
+  shuffle)
 
 import Dict exposing (fromList)
+import Array exposing (fromList)
+import Random exposing (initialSeed)
 import Test exposing (..)
 import Expect
 
@@ -246,7 +249,7 @@ all =
                   ]
                 actualValue = indexBy
                   (\x ->
-                    let
+                    let 
                       maybeFirstSymbol = List.head <| String.toList x
                     in case maybeFirstSymbol of
                       Just firstSymbol -> (String.fromChar firstSymbol)
@@ -254,5 +257,23 @@ all =
                   ["abc", "bca", "cab"]
               in
                 Expect.equal expectedValue actualValue
+          ]
+        , describe "shuffle"
+          [ test "should shuffle array" <|
+            \() ->
+              let
+                randomSeed = initialSeed 123
+                expectedValue =  Array.fromList [4, 1, 5, 2, 3, 6]
+                actualValue = shuffle (Array.fromList [1, 2, 3, 4, 5, 6]) randomSeed
+              in
+                Expect.equal expectedValue actualValue
+            , test "different seeds produce different shufflings" <|
+            \() ->
+              let
+                randomSeed = initialSeed 123
+                otherRandomSeed= initialSeed 234
+                arr = Array.fromList [1, 2, 3, 4, 5, 6]
+              in
+                Expect.notEqual (shuffle arr randomSeed) (shuffle arr otherRandomSeed)
           ]
         ]

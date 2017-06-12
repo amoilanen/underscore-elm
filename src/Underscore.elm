@@ -18,7 +18,8 @@ module Underscore exposing (
   max,
   sortBy,
   groupBy,
-  indexBy)
+  indexBy,
+  shuffle)
 
 {-| Port to Elm of Underscore 1.8.3 functions.
 
@@ -42,10 +43,13 @@ module Underscore exposing (
 @docs sortBy
 @docs groupBy
 @docs indexBy
+@docs shuffle
 -}
 
 import List exposing (map, foldl, filter, all)
+import Array exposing (Array, append, fromList, get, slice, length, push)
 import Dict exposing (Dict, keys, get, update)
+import Random exposing (Seed, int, step)
 
 {-| Transforms a given list by applying the provided element transformation function to every element.
 
@@ -285,3 +289,21 @@ indexBy property list =
     )
   in 
     List.foldr reductionStep Dict.empty list
+
+{-| Shuffles the given list using the Fisher and Yates'
+  original method https://en.wikipedia.org/wiki/Fisher%E2%80%93Yates_shuffle
+  if the same randomSeed is provided, the same shuffling is produced
+
+    (shuffle (Array.fromList [1, 2, 3, 4, 5, 6]) (initialSeed 123)) == (Array.fromList [4, 1, 5, 2, 3, 6])
+-}
+shuffle : Array a -> Seed -> Array a
+shuffle arr randomSeed =
+  let
+    (randomIndex, nextRandomSeed) = step (Random.int 0 ((Array.length arr) - 1)) randomSeed
+    maybeRandomElement = Array.get randomIndex arr
+    arrayBeforeRandomElement = Array.slice 0 randomIndex arr 
+    arrayAfterRandomElement = Array.slice (randomIndex + 1) (Array.length arr) arr
+  in
+    case maybeRandomElement of
+      Just randomElement -> push randomElement (shuffle (append arrayBeforeRandomElement arrayAfterRandomElement) nextRandomSeed)
+      Nothing -> fromList [] -- this branch should never be executed as maybeRandomElement always should be Just x
