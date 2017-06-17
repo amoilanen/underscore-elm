@@ -1,7 +1,7 @@
 {
     "version": "1.0.0",
     "summary": "Port of Underscore.js to Elm",
-    "repository": "https://github.com/antivanov/underscore.elm.git",
+    "repository": "https://github.com/antivanov/underscore-elm.git",
     "license": "MIT",
     "source-directories": [
         "src",
