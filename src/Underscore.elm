@@ -19,7 +19,12 @@ module Underscore exposing (
   sortBy,
   groupBy,
   indexBy,
-  shuffle)
+  shuffleArr,
+  sampleArr,
+  sampleArrOne,
+  shuffle,
+  sample,
+  sampleOne)
 
 {-| Port to Elm of Underscore 1.8.3 functions.
 
@@ -43,7 +48,12 @@ module Underscore exposing (
 @docs sortBy
 @docs groupBy
 @docs indexBy
+@docs shuffleArr
+@docs sampleArr
+@docs sampleArrOne
 @docs shuffle
+@docs sample
+@docs sampleOne
 -}
 
 import List exposing (map, foldl, filter, all)
@@ -294,10 +304,33 @@ indexBy property list =
   original method https://en.wikipedia.org/wiki/Fisher%E2%80%93Yates_shuffle
   if the same randomSeed is provided, the same shuffling is produced
 
-    (shuffle (Array.fromList [1, 2, 3, 4, 5, 6]) (initialSeed 123)) == (Array.fromList [4, 1, 5, 2, 3, 6])
+    (shuffle [1, 2, 3, 4, 5, 6] (initialSeed 123)) == [4, 1, 5, 2, 3, 6])
 -}
-shuffle : Array a -> Seed -> Array a
-shuffle arr randomSeed =
+shuffle : List a -> Seed -> List a
+shuffle list randomSeed = Array.toList (shuffleArr (Array.fromList list) randomSeed)
+
+{-| Shuffles the given array using the Fisher and Yates'
+  original method https://en.wikipedia.org/wiki/Fisher%E2%80%93Yates_shuffle
+  if the same randomSeed is provided, the same shuffling is produced
+
+    (shuffleArr (Array.fromList [1, 2, 3, 4, 5, 6]) (initialSeed 123)) == (Array.fromList [4, 1, 5, 2, 3, 6])
+-}
+shuffleArr : Array a -> Seed -> Array a
+shuffleArr arr randomSeed = sampleArr arr (Array.length arr) randomSeed
+
+{-| Samples list. If the same randomSeed it provided the same sampling is produced.
+
+    (sample [1, 2, 3, 4, 5, 6] 3 (initialSeed 123)) == [2, 3, 6]
+-}
+sample : List a -> Int -> Seed -> List a
+sample list sampleSize randomSeed = Array.toList (sampleArr (Array.fromList list) sampleSize randomSeed)
+
+{-| Samples array. If the same randomSeed it provided the same sampling is produced.
+
+    (sampleArr (Array.fromList [1, 2, 3, 4, 5, 6]) 3 (initialSeed 123)) == (Array.fromList [2, 3, 6])
+-}
+sampleArr : Array a -> Int -> Seed -> Array a
+sampleArr arr sampleSize randomSeed =
   let
     (randomIndex, nextRandomSeed) = step (Random.int 0 ((Array.length arr) - 1)) randomSeed
     maybeRandomElement = Array.get randomIndex arr
@@ -305,5 +338,25 @@ shuffle arr randomSeed =
     arrayAfterRandomElement = Array.slice (randomIndex + 1) (Array.length arr) arr
   in
     case maybeRandomElement of
-      Just randomElement -> push randomElement (shuffle (append arrayBeforeRandomElement arrayAfterRandomElement) nextRandomSeed)
+      Just randomElement ->
+        (case sampleSize of
+          1 -> Array.fromList [randomElement]
+          x -> if x > 1 then
+              push randomElement (sampleArr (append arrayBeforeRandomElement arrayAfterRandomElement) (sampleSize - 1) nextRandomSeed)
+            else
+              Array.fromList [])
       Nothing -> fromList [] -- this branch should never be executed as maybeRandomElement always should be Just x
+
+{-| Same as sample with sampleSize of 1 but returns a single element, not a list.
+
+    (sampleOne [1, 2, 3, 4, 5, 6] (initialSeed 123)) == Just 6
+-}
+sampleOne : List a -> Seed -> Maybe a
+sampleOne list randomSeed = sampleArrOne (Array.fromList list) randomSeed
+
+{-| Same as sample with sampleSize of 1 but returns a single element, not an array.
+
+    (sampleArrOne (Array.fromList [1, 2, 3, 4, 5, 6]) (initialSeed 123)) == Just 6
+-}
+sampleArrOne : Array a -> Seed -> Maybe a
+sampleArrOne arr randomSeed = Array.get 0 (sampleArr arr 1 randomSeed)

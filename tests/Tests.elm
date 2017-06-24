@@ -21,7 +21,9 @@ import Underscore exposing (
   sortBy,
   groupBy,
   indexBy,
-  shuffle)
+  shuffleArr,
+  sampleArr,
+  sampleArrOne)
 
 import Dict exposing (fromList)
 import Array exposing (fromList)
@@ -258,13 +260,13 @@ all =
               in
                 Expect.equal expectedValue actualValue
           ]
-        , describe "shuffle"
-          [ test "should shuffle array" <|
+        , describe "shuffleArr"
+          [ test "should shuffleArr array" <|
             \() ->
               let
                 randomSeed = initialSeed 123
                 expectedValue =  Array.fromList [4, 1, 5, 2, 3, 6]
-                actualValue = shuffle (Array.fromList [1, 2, 3, 4, 5, 6]) randomSeed
+                actualValue = shuffleArr (Array.fromList [1, 2, 3, 4, 5, 6]) randomSeed
               in
                 Expect.equal expectedValue actualValue
             , test "different seeds produce different shufflings" <|
@@ -274,6 +276,59 @@ all =
                 otherRandomSeed= initialSeed 234
                 arr = Array.fromList [1, 2, 3, 4, 5, 6]
               in
-                Expect.notEqual (shuffle arr randomSeed) (shuffle arr otherRandomSeed)
+                Expect.notEqual (shuffleArr arr randomSeed) (shuffleArr arr otherRandomSeed)
+          ]
+        , describe "sampleArr"
+          [
+            describe "sampleArr size smaller than array length" [
+              test "should sampleArr array" <|
+              \() ->
+                let
+                  randomSeed = initialSeed 123
+                  expectedValue =  Array.fromList [2, 3, 6]
+                  actualValue = sampleArr (Array.fromList [1, 2, 3, 4, 5, 6]) 3 randomSeed
+                in
+                  Expect.equal expectedValue actualValue
+            ],
+            describe "sampleArr size greater than array length" [
+              test "should sampleArr array" <|
+              \() ->
+                let
+                  randomSeed = initialSeed 123
+                  expectedValue =  Array.fromList [4, 1, 5, 2, 3, 6]
+                  actualValue = sampleArr (Array.fromList [1, 2, 3, 4, 5, 6]) 10 randomSeed
+                in
+                  Expect.equal expectedValue actualValue
+            ],
+            describe "sampleArr size is 1" [
+              test "should sampleArr array" <|
+              \() ->
+                let
+                  randomSeed = initialSeed 123
+                  expectedValue =  Array.fromList [6]
+                  actualValue = sampleArr (Array.fromList [1, 2, 3, 4, 5, 6]) 1 randomSeed
+                in
+                  Expect.equal expectedValue actualValue
+            ],
+            describe "sampleArrOne" [
+              test "should sampleArr array" <|
+              \() ->
+                let
+                  randomSeed = initialSeed 123
+                  expectedValue =  Just 6
+                  actualValue = sampleArrOne (Array.fromList [1, 2, 3, 4, 5, 6]) randomSeed
+                in
+                  Expect.equal expectedValue actualValue
+            ],
+            describe "sampleArr size is negative" [
+              test "should sampleArr array" <|
+              \() ->
+                let
+                  randomSeed = initialSeed 123
+                  expectedValue =  Array.fromList []
+                  actualValue = sampleArr (Array.fromList [1, 2, 3, 4, 5, 6]) -3 randomSeed
+                in
+                  Expect.equal expectedValue actualValue
+            ]
           ]
         ]
