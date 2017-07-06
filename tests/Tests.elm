@@ -23,7 +23,8 @@ import Underscore exposing (
   indexBy,
   shuffleArr,
   sampleArr,
-  sampleArrOne)
+  sampleArrOne,
+  partition)
 
 import Dict exposing (fromList)
 import Array exposing (fromList)
@@ -330,5 +331,10 @@ all =
                 in
                   Expect.equal expectedValue actualValue
             ]
+          ]
+        , describe "partition"
+          [ test "partitions list by given predicate" <|
+            \() ->
+              Expect.equal ([2, 4], [1, 3, 5]) (partition (\x -> x % 2 == 0) [1, 2, 3, 4, 5])
           ]
         ]

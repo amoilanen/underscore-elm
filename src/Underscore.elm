@@ -24,7 +24,10 @@ module Underscore exposing (
   sampleArrOne,
   shuffle,
   sample,
-  sampleOne)
+  sampleOne,
+  toArray,
+  size,
+  partition)
 
 {-| Port to Elm of Underscore 1.8.3 functions.
 
@@ -54,6 +57,9 @@ module Underscore exposing (
 @docs shuffle
 @docs sample
 @docs sampleOne
+@docs toArray
+@docs size
+@docs partition
 -}
 
 import List exposing (map, foldl, filter, all)
@@ -360,3 +366,29 @@ sampleOne list randomSeed = sampleArrOne (Array.fromList list) randomSeed
 -}
 sampleArrOne : Array a -> Seed -> Maybe a
 sampleArrOne arr randomSeed = Array.get 0 (sampleArr arr 1 randomSeed)
+
+{-| Convert list to array. Alias for 'Array.fromList'
+
+....(toArray [1, 2, 3]) == (Array.fromList [1, 2, 3])
+-}
+toArray : List a -> Array a
+toArray = Array.fromList
+
+{-| Returns length of the given list. Alias for 'List.length'
+
+    (size [1, 2, 3, 4, 5]) == 5
+-}
+size : List a -> Int
+size = List.length
+
+{-| Partitions list into two parts: one contains all the elements that satisfy the predicate and those that does not satisfy it.
+
+....(partition (\x -> x % 2 == 0) [1, 2, 3, 4, 5]) == ([2, 4], [1, 3, 5])
+-}
+partition : (a -> Bool) -> List a -> (List a, List a)
+partition predicate list =
+  let
+    first = filter predicate list
+    second = filter (\x -> not (predicate x) ) list
+  in
+    (first, second)
