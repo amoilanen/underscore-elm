@@ -24,7 +24,8 @@ import Underscore exposing (
   shuffleArr,
   sampleArr,
   sampleArrOne,
-  partition)
+  partition,
+  first)
 
 import Dict exposing (fromList)
 import Array exposing (fromList)
@@ -336,5 +337,16 @@ all =
           [ test "partitions list by given predicate" <|
             \() ->
               Expect.equal ([2, 4], [1, 3, 5]) (partition (\x -> x % 2 == 0) [1, 2, 3, 4, 5])
+          ]
+        , describe "first"
+          [ test "takes first n elements if n less than list length" <|
+            \() ->
+              Expect.equal ([1, 2, 3]) (first 3 [1, 2, 3, 4, 5]),
+            test "takes all list elements if n greater than list length" <|
+            \() ->
+              Expect.equal ([1, 2, 3]) (first 5 [1, 2, 3]),
+            test "takes no elements if n is not positive" <|
+            \() ->
+              Expect.equal ([]) (first -3 [1, 2, 3])
           ]
         ]

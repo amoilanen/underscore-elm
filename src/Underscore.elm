@@ -27,7 +27,8 @@ module Underscore exposing (
   sampleOne,
   toArray,
   size,
-  partition)
+  partition,
+  first)
 
 {-| Port to Elm of Underscore 1.8.3 functions.
 
@@ -60,6 +61,7 @@ module Underscore exposing (
 @docs toArray
 @docs size
 @docs partition
+@docs first
 -}
 
 import List exposing (map, foldl, filter, all)
@@ -392,3 +394,24 @@ partition predicate list =
     second = filter (\x -> not (predicate x) ) list
   in
     (first, second)
+
+{-| Returns first n elements of the list.
+
+....(first 3 [1 2 3 4 5]) == [1 2 3]
+-}
+first : Int -> List a -> List a
+first n list =
+  let
+    listStart = case list of
+      head::tail -> [ head ]
+      [] -> []
+    restOfList = case list of
+      head::tail -> tail
+      [] -> []
+  in
+    if n > 1 then
+      listStart ++ (first (n - 1) restOfList)
+    else if n == 1 then
+      listStart
+    else
+      []
