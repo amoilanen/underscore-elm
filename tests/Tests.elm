@@ -25,7 +25,8 @@ import Underscore exposing (
   sampleArr,
   sampleArrOne,
   partition,
-  first)
+  first,
+  initial)
 
 import Dict exposing (fromList)
 import Array exposing (fromList)
@@ -341,12 +342,23 @@ all =
         , describe "first"
           [ test "takes first n elements if n less than list length" <|
             \() ->
-              Expect.equal ([1, 2, 3]) (first 3 [1, 2, 3, 4, 5]),
+              Expect.equal [1, 2, 3] (first 3 [1, 2, 3, 4, 5]),
             test "takes all list elements if n greater than list length" <|
             \() ->
-              Expect.equal ([1, 2, 3]) (first 5 [1, 2, 3]),
+              Expect.equal [1, 2, 3] (first 5 [1, 2, 3]),
             test "takes no elements if n is not positive" <|
             \() ->
-              Expect.equal ([]) (first -3 [1, 2, 3])
+              Expect.equal [] (first -3 [1, 2, 3])
+          ]
+        , describe "initial"
+          [ test "takes first length - n elements if n less than list length" <|
+            \() ->
+              Expect.equal [1, 2] (initial 3 [1, 2, 3, 4, 5]),
+            test "takes all list elements if n is negative" <|
+            \() ->
+              Expect.equal [1, 2, 3] (initial -3 [1, 2, 3]),
+            test "takes all elements if n is 0" <|
+            \() ->
+              Expect.equal [1, 2, 3] (initial 0 [1, 2, 3])
           ]
         ]

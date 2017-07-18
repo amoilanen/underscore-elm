@@ -28,7 +28,10 @@ module Underscore exposing (
   toArray,
   size,
   partition,
-  first)
+  first,
+  firstOne,
+  initial,
+  initialOne)
 
 {-| Port to Elm of Underscore 1.8.3 functions.
 
@@ -62,6 +65,9 @@ module Underscore exposing (
 @docs size
 @docs partition
 @docs first
+@docs firstOne
+@docs initial
+@docs initialOne
 -}
 
 import List exposing (map, foldl, filter, all)
@@ -400,18 +406,25 @@ partition predicate list =
 ....(first 3 [1 2 3 4 5]) == [1 2 3]
 -}
 first : Int -> List a -> List a
-first n list =
-  let
-    listStart = case list of
-      head::tail -> [ head ]
-      [] -> []
-    restOfList = case list of
-      head::tail -> tail
-      [] -> []
-  in
-    if n > 1 then
-      listStart ++ (first (n - 1) restOfList)
-    else if n == 1 then
-      listStart
-    else
-      []
+first = List.take
+
+{-| Returns first element of the list.
+
+....(firstOne [1, 2, 3]) == (Maybe 1)
+-}
+firstOne : List a -> Maybe a
+firstOne = List.head
+
+{-| Return everything but the last n entries of the list.
+
+    (initial 2 [1, 2, 3, 4, 5]) == [1, 2, 3]
+-}
+initial : Int -> List a -> List a
+initial n list = List.take ((List.length list) - n) list
+
+{-| Shortcut for (initial 1)
+
+....(initialOne [1, 2, 3]) == [1, 2]
+-}
+initialOne : List a -> List a
+initialOne = initial 1
