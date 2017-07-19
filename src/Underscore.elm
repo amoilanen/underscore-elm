@@ -31,7 +31,9 @@ module Underscore exposing (
   first,
   firstOne,
   initial,
-  initialOne)
+  initialOne,
+  lastArr,
+  lastArrOne)
 
 {-| Port to Elm of Underscore 1.8.3 functions.
 
@@ -68,6 +70,8 @@ module Underscore exposing (
 @docs firstOne
 @docs initial
 @docs initialOne
+@docs lastArr
+@docs lastArrOne
 -}
 
 import List exposing (map, foldl, filter, all)
@@ -415,6 +419,9 @@ first = List.take
 firstOne : List a -> Maybe a
 firstOne = List.head
 
+--TODO: firstArr
+--TODO: firstOneArr
+
 {-| Return everything but the last n entries of the list.
 
     (initial 2 [1, 2, 3, 4, 5]) == [1, 2, 3]
@@ -422,9 +429,38 @@ firstOne = List.head
 initial : Int -> List a -> List a
 initial n list = List.take ((List.length list) - n) list
 
+--TODO: Rename to initialArr
+
 {-| Shortcut for (initial 1)
 
 ....(initialOne [1, 2, 3]) == [1, 2]
 -}
 initialOne : List a -> List a
 initialOne = initial 1
+
+--TODO: Rename initialArrOne
+
+{-| Take last n entries of the list
+
+....(last 3 (Array.fromList [1, 2, 3, 4, 5]) ) == [3, 4, 5]
+-}
+lastArr : Int -> Array a -> Array a
+lastArr n arr =
+  let
+    len = Array.length arr
+  in
+    if (n < len) then
+      Array.slice (len - n) len arr
+    else
+      arr
+
+{-| Take last entry in the list.
+
+    (last (Array.fromList [1, 2, 3]) ) == Maybe 3
+-}
+lastArrOne : Array a -> Maybe a
+lastArrOne arr =
+  if Array.isEmpty arr then
+    Nothing
+  else
+    Array.get (Array.length arr - 1) arr

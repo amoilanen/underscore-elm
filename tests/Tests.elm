@@ -26,7 +26,10 @@ import Underscore exposing (
   sampleArrOne,
   partition,
   first,
-  initial)
+  initial,
+  lastArr,
+  lastArrOne,
+  toArray)
 
 import Dict exposing (fromList)
 import Array exposing (fromList)
@@ -360,5 +363,16 @@ all =
             test "takes all elements if n is 0" <|
             \() ->
               Expect.equal [1, 2, 3] (initial 0 [1, 2, 3])
+          ]
+        , describe "last"
+          [ test "takes last n elements if n less than list length" <|
+            \() ->
+              Expect.equal (toArray [3, 4, 5]) (lastArr 3 (toArray [1, 2, 3, 4, 5]) ),
+            test "takes no elements if n is negative" <|
+            \() ->
+              Expect.equal (toArray []) (lastArr -3 (toArray [1, 2, 3]) ),
+            test "takes all elements if n exceeds list length" <|
+            \() ->
+              Expect.equal (toArray [1, 2, 3]) (lastArr 5 (toArray [1, 2, 3]) )
           ]
         ]
