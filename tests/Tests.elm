@@ -26,6 +26,7 @@ import Underscore exposing (
   sampleArrOne,
   partition,
   first,
+  firstArr,
   initialArr,
   lastArr,
   toArray)
@@ -351,6 +352,17 @@ all =
             test "takes no elements if n is not positive" <|
             \() ->
               Expect.equal [] (first -3 [1, 2, 3])
+          ]
+        , describe "firstArr"
+          [ test "takes first n elements if n less than list length" <|
+            \() ->
+              Expect.equal (toArray [1, 2, 3]) (firstArr 3 (toArray [1, 2, 3, 4, 5]) ),
+            test "takes all list elements if n greater than list length" <|
+            \() ->
+              Expect.equal (toArray [1, 2, 3]) (firstArr 5 (toArray [1, 2, 3]) ),
+            test "takes no elements if n is not positive" <|
+            \() ->
+              Expect.equal (toArray []) (firstArr -3 (toArray [1, 2, 3]) )
           ]
         , describe "initial"
           [ test "takes first length - n elements if n less than list length" <|
