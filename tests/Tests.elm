@@ -26,9 +26,8 @@ import Underscore exposing (
   sampleArrOne,
   partition,
   first,
-  initial,
+  initialArr,
   lastArr,
-  lastArrOne,
   toArray)
 
 import Dict exposing (fromList)
@@ -356,13 +355,13 @@ all =
         , describe "initial"
           [ test "takes first length - n elements if n less than list length" <|
             \() ->
-              Expect.equal [1, 2] (initial 3 [1, 2, 3, 4, 5]),
+              Expect.equal (toArray [1, 2]) (initialArr 3 (toArray [1, 2, 3, 4, 5]) ),
             test "takes all list elements if n is negative" <|
             \() ->
-              Expect.equal [1, 2, 3] (initial -3 [1, 2, 3]),
+              Expect.equal (toArray [1, 2, 3]) (initialArr -3 (toArray [1, 2, 3]) ),
             test "takes all elements if n is 0" <|
             \() ->
-              Expect.equal [1, 2, 3] (initial 0 [1, 2, 3])
+              Expect.equal (toArray [1, 2, 3]) (initialArr 0 (toArray [1, 2, 3]) )
           ]
         , describe "last"
           [ test "takes last n elements if n less than list length" <|

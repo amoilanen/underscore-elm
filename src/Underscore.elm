@@ -29,9 +29,11 @@ module Underscore exposing (
   size,
   partition,
   first,
+  firstArr,
   firstOne,
-  initial,
-  initialOne,
+  firstArrOne,
+  initialArr,
+  initialArrOne,
   lastArr,
   lastArrOne)
 
@@ -67,9 +69,11 @@ module Underscore exposing (
 @docs size
 @docs partition
 @docs first
+@docs firstArr
 @docs firstOne
-@docs initial
-@docs initialOne
+@docs firstArrOne
+@docs initialArr
+@docs initialArrOne
 @docs lastArr
 @docs lastArrOne
 -}
@@ -412,6 +416,13 @@ partition predicate list =
 first : Int -> List a -> List a
 first = List.take
 
+{-| Returns first n elements of the array.
+
+....(first 3 (Array.fromList [1 2 3 4 5]) ) == (Array.fromList [1 2 3])
+-}
+firstArr : Int -> Array a -> Array a
+firstArr n = Array.slice 0 n
+
 {-| Returns first element of the list.
 
 ....(firstOne [1, 2, 3]) == (Maybe 1)
@@ -419,26 +430,30 @@ first = List.take
 firstOne : List a -> Maybe a
 firstOne = List.head
 
---TODO: firstArr
---TODO: firstOneArr
+{-| Returns first element of the array.
+
+....(firstArrOne (toArray [1, 2, 3]) ) == (Maybe 1)
+-}
+firstArrOne : Array a -> Maybe a
+firstArrOne = Array.get(0)
 
 {-| Return everything but the last n entries of the list.
 
     (initial 2 [1, 2, 3, 4, 5]) == [1, 2, 3]
 -}
-initial : Int -> List a -> List a
-initial n list = List.take ((List.length list) - n) list
-
---TODO: Rename to initialArr
+initialArr : Int -> Array a -> Array a
+initialArr n arr = 
+  if (n > 0) then
+    Array.slice 0 -n arr
+  else
+    arr
 
 {-| Shortcut for (initial 1)
 
 ....(initialOne [1, 2, 3]) == [1, 2]
 -}
-initialOne : List a -> List a
-initialOne = initial 1
-
---TODO: Rename initialArrOne
+initialArrOne : Array a -> Array a
+initialArrOne = initialArr 1
 
 {-| Take last n entries of the list
 
