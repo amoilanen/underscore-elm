@@ -1,4 +1,4 @@
-module Underscore exposing (
+module Underscore.List exposing (
   map,
   reduce,
   reduceRight,
@@ -19,23 +19,11 @@ module Underscore exposing (
   sortBy,
   groupBy,
   indexBy,
-  shuffleArr,
-  sampleArr,
-  sampleArrOne,
-  shuffle,
-  sample,
-  sampleOne,
   toArray,
   size,
   partition,
   first,
-  firstArr,
-  firstOne,
-  firstArrOne,
-  initialArr,
-  initialArrOne,
-  lastArr,
-  lastArrOne)
+  firstOne)
 
 {-| Port to Elm of Underscore 1.8.3 functions.
 
@@ -59,9 +47,6 @@ module Underscore exposing (
 @docs sortBy
 @docs groupBy
 @docs indexBy
-@docs shuffleArr
-@docs sampleArr
-@docs sampleArrOne
 @docs shuffle
 @docs sample
 @docs sampleOne
@@ -69,17 +54,11 @@ module Underscore exposing (
 @docs size
 @docs partition
 @docs first
-@docs firstArr
 @docs firstOne
-@docs firstArrOne
-@docs initialArr
-@docs initialArrOne
-@docs lastArr
-@docs lastArrOne
 -}
 
 import List exposing (map, foldl, filter, all)
-import Array exposing (Array, append, fromList, get, slice, length, push)
+import Array exposing (Array, fromList)
 import Dict exposing (Dict, keys, get, update)
 import Random exposing (Seed, int, step)
 
@@ -322,67 +301,6 @@ indexBy property list =
   in 
     List.foldr reductionStep Dict.empty list
 
-{-| Shuffles the given list using the Fisher and Yates'
-  original method https://en.wikipedia.org/wiki/Fisher%E2%80%93Yates_shuffle
-  if the same randomSeed is provided, the same shuffling is produced
-
-    (shuffle [1, 2, 3, 4, 5, 6] (initialSeed 123)) == [4, 1, 5, 2, 3, 6])
--}
-shuffle : List a -> Seed -> List a
-shuffle list randomSeed = Array.toList (shuffleArr (Array.fromList list) randomSeed)
-
-{-| Shuffles the given array using the Fisher and Yates'
-  original method https://en.wikipedia.org/wiki/Fisher%E2%80%93Yates_shuffle
-  if the same randomSeed is provided, the same shuffling is produced
-
-    (shuffleArr (Array.fromList [1, 2, 3, 4, 5, 6]) (initialSeed 123)) == (Array.fromList [4, 1, 5, 2, 3, 6])
--}
-shuffleArr : Array a -> Seed -> Array a
-shuffleArr arr randomSeed = sampleArr arr (Array.length arr) randomSeed
-
-{-| Samples list. If the same randomSeed it provided the same sampling is produced.
-
-    (sample [1, 2, 3, 4, 5, 6] 3 (initialSeed 123)) == [2, 3, 6]
--}
-sample : List a -> Int -> Seed -> List a
-sample list sampleSize randomSeed = Array.toList (sampleArr (Array.fromList list) sampleSize randomSeed)
-
-{-| Samples array. If the same randomSeed it provided the same sampling is produced.
-
-    (sampleArr (Array.fromList [1, 2, 3, 4, 5, 6]) 3 (initialSeed 123)) == (Array.fromList [2, 3, 6])
--}
-sampleArr : Array a -> Int -> Seed -> Array a
-sampleArr arr sampleSize randomSeed =
-  let
-    (randomIndex, nextRandomSeed) = step (Random.int 0 ((Array.length arr) - 1)) randomSeed
-    maybeRandomElement = Array.get randomIndex arr
-    arrayBeforeRandomElement = Array.slice 0 randomIndex arr 
-    arrayAfterRandomElement = Array.slice (randomIndex + 1) (Array.length arr) arr
-  in
-    case maybeRandomElement of
-      Just randomElement ->
-        (case sampleSize of
-          1 -> Array.fromList [randomElement]
-          x -> if x > 1 then
-              push randomElement (sampleArr (append arrayBeforeRandomElement arrayAfterRandomElement) (sampleSize - 1) nextRandomSeed)
-            else
-              Array.fromList [])
-      Nothing -> fromList [] -- this branch should never be executed as maybeRandomElement always should be Just x
-
-{-| Same as sample with sampleSize of 1 but returns a single element, not a list.
-
-    (sampleOne [1, 2, 3, 4, 5, 6] (initialSeed 123)) == Just 6
--}
-sampleOne : List a -> Seed -> Maybe a
-sampleOne list randomSeed = sampleArrOne (Array.fromList list) randomSeed
-
-{-| Same as sample with sampleSize of 1 but returns a single element, not an array.
-
-    (sampleArrOne (Array.fromList [1, 2, 3, 4, 5, 6]) (initialSeed 123)) == Just 6
--}
-sampleArrOne : Array a -> Seed -> Maybe a
-sampleArrOne arr randomSeed = Array.get 0 (sampleArr arr 1 randomSeed)
-
 {-| Convert list to array. Alias for 'Array.fromList'
 
 ....(toArray [1, 2, 3]) == (Array.fromList [1, 2, 3])
@@ -416,66 +334,9 @@ partition predicate list =
 first : Int -> List a -> List a
 first = List.take
 
-{-| Returns first n elements of the array.
-
-....(first 3 (Array.fromList [1 2 3 4 5]) ) == (Array.fromList [1 2 3])
--}
-firstArr : Int -> Array a -> Array a
-firstArr n = Array.slice 0 n
-
 {-| Returns first element of the list.
 
 ....(firstOne [1, 2, 3]) == (Maybe 1)
 -}
 firstOne : List a -> Maybe a
 firstOne = List.head
-
-{-| Returns first element of the array.
-
-....(firstArrOne (toArray [1, 2, 3]) ) == (Maybe 1)
--}
-firstArrOne : Array a -> Maybe a
-firstArrOne = Array.get(0)
-
-{-| Return everything but the last n entries of the list.
-
-    (initial 2 [1, 2, 3, 4, 5]) == [1, 2, 3]
--}
-initialArr : Int -> Array a -> Array a
-initialArr n arr = 
-  if (n > 0) then
-    Array.slice 0 -n arr
-  else
-    arr
-
-{-| Shortcut for (initial 1)
-
-....(initialOne [1, 2, 3]) == [1, 2]
--}
-initialArrOne : Array a -> Array a
-initialArrOne = initialArr 1
-
-{-| Take last n entries of the list
-
-....(last 3 (Array.fromList [1, 2, 3, 4, 5]) ) == [3, 4, 5]
--}
-lastArr : Int -> Array a -> Array a
-lastArr n arr =
-  let
-    len = Array.length arr
-  in
-    if (n < len) then
-      Array.slice (len - n) len arr
-    else
-      arr
-
-{-| Take last entry in the list.
-
-    (last (Array.fromList [1, 2, 3]) ) == Maybe 3
--}
-lastArrOne : Array a -> Maybe a
-lastArrOne arr =
-  if Array.isEmpty arr then
-    Nothing
-  else
-    Array.get (Array.length arr - 1) arr

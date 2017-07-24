@@ -1,6 +1,6 @@
-module Tests exposing (..)
+module ListTest exposing (..)
 
-import Underscore exposing (
+import Underscore.List exposing (
   map,
   reduce,
   reduceRight,
@@ -21,19 +21,11 @@ import Underscore exposing (
   sortBy,
   groupBy,
   indexBy,
-  shuffleArr,
-  sampleArr,
-  sampleArrOne,
   partition,
-  first,
-  firstArr,
-  initialArr,
-  lastArr,
-  toArray)
+  first)
 
 import Dict exposing (fromList)
-import Array exposing (fromList)
-import Random exposing (initialSeed)
+
 import Test exposing (..)
 import Expect
 
@@ -43,10 +35,10 @@ all =
         [ describe "map"
           [ test "non-empty list" <|
             \() ->
-              Expect.equal [2, 4, 6] (Underscore.map (\x -> 2 * x) [1, 2, 3])
+              Expect.equal [2, 4, 6] (Underscore.List.map (\x -> 2 * x) [1, 2, 3])
             , test "empty list" <|
             \() ->
-              Expect.equal [] (Underscore.map (\x -> 2 * x) [])
+              Expect.equal [] (Underscore.List.map (\x -> 2 * x) [])
           ]
         , describe "reduce"
           [ test "non-empty list" <|
@@ -78,10 +70,10 @@ all =
         , describe "filter"
           [ test "leaves only the elements satisfying the predicate" <|
             \() ->
-              Expect.equal [2, 4] (Underscore.filter (\x -> x % 2 == 0) [1, 2, 3, 4])
+              Expect.equal [2, 4] (Underscore.List.filter (\x -> x % 2 == 0) [1, 2, 3, 4])
             , test "returns empty list if list is empty" <|
             \() ->
-              Expect.equal [] (Underscore.filter (\x -> x % 2 == 0) [1, 3, 5])
+              Expect.equal [] (Underscore.List.filter (\x -> x % 2 == 0) [1, 3, 5])
           ]
         , describe "whereDict"
           [ test "leaves only the elements matching the provided dictionary" <|
@@ -148,34 +140,34 @@ all =
         , describe "reject"
           [ test "rejects the elements matching the provided dictionary" <|
             \() ->
-              Expect.equal [1, 3] (Underscore.reject (\x -> x % 2 == 0) [1, 2, 3, 4])
+              Expect.equal [1, 3] (Underscore.List.reject (\x -> x % 2 == 0) [1, 2, 3, 4])
             , test "returns empty list if list is empty" <|
             \() ->
-              Expect.equal [] (Underscore.reject (\x -> x % 2 == 0) [])
+              Expect.equal [] (Underscore.List.reject (\x -> x % 2 == 0) [])
           ]
         , describe "every"
           [ test "every element satisfies the predicate" <|
             \() ->
-              Expect.equal True (Underscore.every (\x -> x % 2 == 0) [2, 4, 6])
+              Expect.equal True (Underscore.List.every (\x -> x % 2 == 0) [2, 4, 6])
             , test "at least one element does not satisfy the predicate" <|
             \() ->
-              Expect.equal False (Underscore.every (\x -> x % 2 == 0) [2, 3, 6])
+              Expect.equal False (Underscore.List.every (\x -> x % 2 == 0) [2, 3, 6])
           ]
         , describe "some"
           [ test "not a single element satisfies the predicate" <|
             \() ->
-              Expect.equal False (Underscore.some (\x -> x % 2 == 0) [1, 3, 5])
+              Expect.equal False (Underscore.List.some (\x -> x % 2 == 0) [1, 3, 5])
             , test "at least one element satisfies the predicate" <|
             \() ->
-              Expect.equal True (Underscore.some (\x -> x % 2 == 0) [2, 3, 6])
+              Expect.equal True (Underscore.List.some (\x -> x % 2 == 0) [2, 3, 6])
           ]
         , describe "contains"
           [ test "list contains element" <|
             \() ->
-              Expect.equal True (Underscore.contains 2 [1, 2, 3])
+              Expect.equal True (Underscore.List.contains 2 [1, 2, 3])
             , test "list does not contain element" <|
             \() ->
-              Expect.equal False (Underscore.contains 4 [1, 2, 3])
+              Expect.equal False (Underscore.List.contains 4 [1, 2, 3])
           ]
         , describe "pluckDict"
           [ test "list of dictionaries some of which contain key" <|
@@ -202,18 +194,18 @@ all =
         , describe "min"
           [ test "list with a minimum element" <|
             \() ->
-              Expect.equal (Just 1) (Underscore.min [2, 1, 3])
+              Expect.equal (Just 1) (Underscore.List.min [2, 1, 3])
             , test "empty list" <|
             \() ->
-              Expect.equal Nothing (Underscore.min [])
+              Expect.equal Nothing (Underscore.List.min [])
           ]
         , describe "max"
           [ test "list with a maximum element" <|
             \() ->
-              Expect.equal (Just 3) (Underscore.max [2, 1, 3])
+              Expect.equal (Just 3) (Underscore.List.max [2, 1, 3])
             , test "empty list" <|
             \() ->
-              Expect.equal Nothing (Underscore.max [])
+              Expect.equal Nothing (Underscore.List.max [])
           ]
         , describe "sortBy"
           [ test "sorts list by given property" <|
@@ -266,77 +258,6 @@ all =
               in
                 Expect.equal expectedValue actualValue
           ]
-        , describe "shuffleArr"
-          [ test "should shuffleArr array" <|
-            \() ->
-              let
-                randomSeed = initialSeed 123
-                expectedValue =  Array.fromList [4, 1, 5, 2, 3, 6]
-                actualValue = shuffleArr (Array.fromList [1, 2, 3, 4, 5, 6]) randomSeed
-              in
-                Expect.equal expectedValue actualValue
-            , test "different seeds produce different shufflings" <|
-            \() ->
-              let
-                randomSeed = initialSeed 123
-                otherRandomSeed= initialSeed 234
-                arr = Array.fromList [1, 2, 3, 4, 5, 6]
-              in
-                Expect.notEqual (shuffleArr arr randomSeed) (shuffleArr arr otherRandomSeed)
-          ]
-        , describe "sampleArr"
-          [
-            describe "sampleArr size smaller than array length" [
-              test "should sampleArr array" <|
-              \() ->
-                let
-                  randomSeed = initialSeed 123
-                  expectedValue =  Array.fromList [2, 3, 6]
-                  actualValue = sampleArr (Array.fromList [1, 2, 3, 4, 5, 6]) 3 randomSeed
-                in
-                  Expect.equal expectedValue actualValue
-            ],
-            describe "sampleArr size greater than array length" [
-              test "should sampleArr array" <|
-              \() ->
-                let
-                  randomSeed = initialSeed 123
-                  expectedValue =  Array.fromList [4, 1, 5, 2, 3, 6]
-                  actualValue = sampleArr (Array.fromList [1, 2, 3, 4, 5, 6]) 10 randomSeed
-                in
-                  Expect.equal expectedValue actualValue
-            ],
-            describe "sampleArr size is 1" [
-              test "should sampleArr array" <|
-              \() ->
-                let
-                  randomSeed = initialSeed 123
-                  expectedValue =  Array.fromList [6]
-                  actualValue = sampleArr (Array.fromList [1, 2, 3, 4, 5, 6]) 1 randomSeed
-                in
-                  Expect.equal expectedValue actualValue
-            ],
-            describe "sampleArrOne" [
-              test "should sampleArr array" <|
-              \() ->
-                let
-                  randomSeed = initialSeed 123
-                  expectedValue =  Just 6
-                  actualValue = sampleArrOne (Array.fromList [1, 2, 3, 4, 5, 6]) randomSeed
-                in
-                  Expect.equal expectedValue actualValue
-            ],
-            describe "sampleArr size is negative" [
-              test "should sampleArr array" <|
-              \() ->
-                let
-                  randomSeed = initialSeed 123
-                  expectedValue =  Array.fromList []
-                  actualValue = sampleArr (Array.fromList [1, 2, 3, 4, 5, 6]) -3 randomSeed
-                in
-                  Expect.equal expectedValue actualValue
-            ]
-          ]
         , describe "partition"
           [ test "partitions list by given predicate" <|
             \() ->
@@ -352,38 +273,5 @@ all =
             test "takes no elements if n is not positive" <|
             \() ->
               Expect.equal [] (first -3 [1, 2, 3])
-          ]
-        , describe "firstArr"
-          [ test "takes first n elements if n less than list length" <|
-            \() ->
-              Expect.equal (toArray [1, 2, 3]) (firstArr 3 (toArray [1, 2, 3, 4, 5]) ),
-            test "takes all list elements if n greater than list length" <|
-            \() ->
-              Expect.equal (toArray [1, 2, 3]) (firstArr 5 (toArray [1, 2, 3]) ),
-            test "takes no elements if n is not positive" <|
-            \() ->
-              Expect.equal (toArray []) (firstArr -3 (toArray [1, 2, 3]) )
-          ]
-        , describe "initial"
-          [ test "takes first length - n elements if n less than list length" <|
-            \() ->
-              Expect.equal (toArray [1, 2]) (initialArr 3 (toArray [1, 2, 3, 4, 5]) ),
-            test "takes all list elements if n is negative" <|
-            \() ->
-              Expect.equal (toArray [1, 2, 3]) (initialArr -3 (toArray [1, 2, 3]) ),
-            test "takes all elements if n is 0" <|
-            \() ->
-              Expect.equal (toArray [1, 2, 3]) (initialArr 0 (toArray [1, 2, 3]) )
-          ]
-        , describe "last"
-          [ test "takes last n elements if n less than list length" <|
-            \() ->
-              Expect.equal (toArray [3, 4, 5]) (lastArr 3 (toArray [1, 2, 3, 4, 5]) ),
-            test "takes no elements if n is negative" <|
-            \() ->
-              Expect.equal (toArray []) (lastArr -3 (toArray [1, 2, 3]) ),
-            test "takes all elements if n exceeds list length" <|
-            \() ->
-              Expect.equal (toArray [1, 2, 3]) (lastArr 5 (toArray [1, 2, 3]) )
           ]
         ]
